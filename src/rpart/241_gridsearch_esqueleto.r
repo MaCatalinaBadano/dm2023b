@@ -128,9 +128,9 @@ for (vmax_depth in c(4, 6, 8, 10, 12, 14)) {
 
         # vminsplit  minima cantidad de registros en un nodo para hacer el split
         param_basicos <- list(
-          "cp" = -0.5, # complejidad minima
+          "cp" = vcp, # complejidad minima
           "minsplit" = vmin_split,
-          "minbucket" = 5, # minima cantidad de registros en una hoja
+          "minbucket" = vmin_bucket # minima cantidad de registros en una hoja
           "maxdepth" = vmax_depth
         ) # profundidad máxima del arbol
 
@@ -139,6 +139,7 @@ for (vmax_depth in c(4, 6, 8, 10, 12, 14)) {
 
         # escribo los resultados al archivo de salida
         cat(
+
           file = archivo_salida,
           append = TRUE,
           sep = "",
