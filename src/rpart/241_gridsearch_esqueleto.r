@@ -130,7 +130,7 @@ for (vmax_depth in c(4, 6, 8, 10, 12, 14)) {
         param_basicos <- list(
           "cp" = vcp, # complejidad minima
           "minsplit" = vmin_split,
-          "minbucket" = vmin_bucket # minima cantidad de registros en una hoja
+          "minbucket" = vmin_bucket, # minima cantidad de registros en una hoja
           "maxdepth" = vmax_depth
         ) # profundidad máxima del arbol
 
