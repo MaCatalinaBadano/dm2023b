@@ -22,9 +22,9 @@ modelo <- rpart(
         data = dtrain, # los datos donde voy a entrenar
         xval = 0,
         cp = -0.5, # esto significa no limitar la complejidad de los splits
-        minsplit = 400, # minima cantidad de registros para que se haga el split
-        minbucket = 32, # tamaño minimo de una hoja
-        maxdepth = 6
+        minsplit = 1000, # minima cantidad de registros para que se haga el split
+        minbucket = 8, # tamaño minimo de una hoja
+        maxdepth = 8
 ) # profundidad maxima del arbol
 
 
@@ -60,6 +60,6 @@ dir.create("./exp/KA2001")
 
 # solo los campos para Kaggle
 fwrite(dapply[, list(numero_de_cliente, Predicted)],
-        file = "./exp/KA2001/K101_001.csv",
+        file = "./exp/KA2001/K101_002.csv",
         sep = ","
 )
