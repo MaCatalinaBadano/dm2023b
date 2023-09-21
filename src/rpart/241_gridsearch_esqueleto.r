@@ -89,7 +89,7 @@ ArbolesMontecarlo <- function(semillas, param_basicos) {
 #------------------------------------------------------------------------------
 
 # Aqui se debe poner la carpeta de la computadora local
-setwd("~/buckets/b1/") # Establezco el Working Directory
+setwd("X:\\gdrive\\ITBA2023B\\") # Establezco el Working Directory
 # cargo los datos
 
 # cargo los datos
@@ -112,21 +112,23 @@ archivo_salida <- "./exp/HT2020/gridsearch.txt"
 cat(
   file = archivo_salida,
   sep = "",
+  "cp", "\t",
   "max_depth", "\t",
   "min_split", "\t",
+  "min_bucket", "\t",
   "ganancia_promedio", "\n"
 )
 
 
 # itero por los loops anidados para cada hiperparametro
 
-for (vmax_depth in c(4, 6, 8, 10, 12, 14)) {
-  for (vmin_split in c(1000, 800, 600, 400, 200, 100, 150, 80, 50)) {
-    for (vmin_bucket in c(50, 90, 150, 200, 500)) {
-      for (vcp in c(-0.5, -0.25, 0, 0.25, 0.5)) {
+for (vmax_depth in c(4, 6, 10, 12, 14)) {
+  for (vmin_split in c(600, 400, 200, 50, 20)) {
+    for (vmin_bucket in c(2, 5, 7, 20, 50)) {
+      for (vcp in c(-0.5, -1)) {
     # notar como se agrega
 
-        # vminsplit  minima cantidad de registros en un nodo para hacer el split
+    # vminsplit  minima cantidad de registros en un nodo para hacer el split
         param_basicos <- list(
           "cp" = vcp, # complejidad minima
           "minsplit" = vmin_split,
@@ -139,13 +141,11 @@ for (vmax_depth in c(4, 6, 8, 10, 12, 14)) {
 
         # escribo los resultados al archivo de salida
         cat(
-
           file = archivo_salida,
           append = TRUE,
           sep = "",
           vmax_depth, "\t",
           vmin_split, "\t",
-          vmin_bucket, "\t",
           vcp, "\t",
           ganancia_promedio, "\n"
         )
