@@ -24,7 +24,7 @@ PARAM$finalmodel$semilla <- 100109
 
 PARAM$finalmodel$num_iterations <- 763
 PARAM$finalmodel$learning_rate <- 101849966404516
-PARAM$finalmodel$feature_fraction <- 643745435224895
+PARAM$finalmodel$feature_fraction <- 0.643745435224895
 PARAM$finalmodel$min_data_in_leaf <- 1025
 PARAM$finalmodel$num_leaves <- 1023
 
