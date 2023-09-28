@@ -74,15 +74,15 @@ PARAM$lgb_basicos <- list(
 # Aqui se cargan los hiperparametros que se optimizan
 #  en la Bayesian Optimization
 PARAM$bo_lgb <- makeParamSet(
-  makeNumericParam("learning_rate", lower = 0.02, upper = 0.3),
-  makeNumericParam("feature_fraction", lower = 0.01, upper = 1.0),
-  makeIntegerParam("num_leaves", lower = 8L, upper = 1024L),
-  makeIntegerParam("min_data_in_leaf", lower = 100L, upper = 50000L)
+  makeNumericParam("learning_rate", lower = 0.05, upper = 0.3),
+  makeNumericParam("feature_fraction", lower = 0.03, upper = 1.0),
+  makeIntegerParam("num_leaves", lower = 15L, upper = 1024L),
+  makeIntegerParam("min_data_in_leaf", lower = 200L, upper = 50000L)
 )
 
 
 # si usted es ambicioso, y tiene paciencia, podria subir este valor a 100
-PARAM$bo_iteraciones <- 50 # iteraciones de la Optimizacion Bayesiana
+PARAM$bo_iteraciones <- 100 # iteraciones de la Optimizacion Bayesiana
 
 PARAM$home <- "~/buckets/b1/"
 
