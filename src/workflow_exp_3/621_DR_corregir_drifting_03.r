@@ -262,9 +262,9 @@ dataset_input <- paste0("./exp_02/", PARAM$exp_input, "/dataset.csv.gz")
 dataset <- fread(dataset_input)
 
 # creo la carpeta donde va el experimento
-dir.create(paste0("./exp_02/", PARAM$experimento, "/"), showWarnings = FALSE)
+dir.create(paste0("./exp_03/", PARAM$experimento, "/"), showWarnings = FALSE)
 # Establezco el Working Directory DEL EXPERIMENTO
-setwd(paste0("./exp_02/", PARAM$experimento, "/"))
+setwd(paste0("./exp_03/", PARAM$experimento, "/"))
 
 GrabarOutput()
 write_yaml(PARAM, file = "parametros.yml") # escribo parametros utilizados
