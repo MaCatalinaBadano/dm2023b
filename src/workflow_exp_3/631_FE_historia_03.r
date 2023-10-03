@@ -21,12 +21,12 @@ PARAM$experimento <- "FE6310"
 
 PARAM$exp_input <- "DR6210"
 
-PARAM$lag1 <- TRUE
+PARAM$lag1 <- FALSE
 PARAM$lag2 <- TRUE
-PARAM$lag3 <- FALSE
+PARAM$lag3 <- TRUE
 
 PARAM$Tendencias1$run <- TRUE
-PARAM$Tendencias1$ventana <- 6
+PARAM$Tendencias1$ventana <- 4
 PARAM$Tendencias1$tendencia <- TRUE
 PARAM$Tendencias1$minimo <- FALSE
 PARAM$Tendencias1$maximo <- FALSE
@@ -44,7 +44,7 @@ PARAM$Tendencias2$ratioavg <- FALSE
 PARAM$Tendencias2$ratiomax <- FALSE
 
 
-PARAM$RandomForest$run <- TRUE
+PARAM$RandomForest$run <- FALSE
 PARAM$RandomForest$num.trees <- 10
 PARAM$RandomForest$max.depth <- 6
 PARAM$RandomForest$min.node.size <- 2000
@@ -53,9 +53,9 @@ PARAM$RandomForest$semilla <- 289733 # cambiar por la propia semilla
 
 
 # varia de 0.0 a 2.0, si es 0.0 NO se activan
-PARAM$CanaritosAsesinos$ratio <- 0.0
+PARAM$CanaritosAsesinos$ratio <- 0.5
 # desvios estandar de la media, para el cutoff
-PARAM$CanaritosAsesinos$desvios <- 4.0
+PARAM$CanaritosAsesinos$desvios <- 5.0
 # cambiar por la propia semilla
 PARAM$CanaritosAsesinos$semilla <- 289733
 
@@ -81,7 +81,7 @@ GrabarOutput <- function() {
 #  tendencia calculada con cuadrados minimos
 # la formula de calculo de la tendencia puede verse en
 #  https://stats.libretexts.org/Bookshelves/Introductory_Statistics/Book%3A_Introductory_Statistics_(Shafer_and_Zhang)/10%3A_Correlation_and_Regression/10.04%3A_The_Least_Squares_Regression_Line
-# para la max�ma velocidad esta funcion esta escrita en lenguaje C,
+# para la maxíma velocidad esta funcion esta escrita en lenguaje C,
 # y no en la porqueria de R o Python
 
 cppFunction("NumericVector fhistC(NumericVector pcolumna, IntegerVector pdesde )
@@ -230,82 +230,79 @@ TendenciaYmuchomas <- function(
 # agrega al dataset nuevas variables {0,1}
 #  que provienen de las hojas de un Random Forest
 
-#experimento 1 : no aplico FE con las variables derivadas del RF.
-#ELIMINO ESTA FUNCION DEL CODIGO
+AgregaVarRandomForest <- function(
+    num.trees, max.depth,
+    min.node.size, mtry, semilla) {
+  gc()
+  dataset[, clase01 := ifelse(clase_ternaria == "CONTINUA", 0, 1)]
 
-#AgregaVarRandomForest <- function(
-#    num.trees, max.depth,
- #   min.node.size, mtry, semilla) {
- # gc()
-  #dataset[, clase01 := ifelse(clase_ternaria == "CONTINUA", 0, 1)]
+  campos_buenos <- setdiff(colnames(dataset), c("clase_ternaria"))
 
-  #campos_buenos <- setdiff(colnames(dataset), c("clase_ternaria"))
+  dataset_rf <- copy(dataset[, campos_buenos, with = FALSE])
+  set.seed(semilla, kind = "L'Ecuyer-CMRG")
+  azar <- runif(nrow(dataset_rf))
 
-  #dataset_rf <- copy(dataset[, campos_buenos, with = FALSE])
-  #set.seed(semilla, kind = "L'Ecuyer-CMRG")
-  #azar <- runif(nrow(dataset_rf))
-
-  #dataset_rf[, entrenamiento :=
-    #as.integer(foto_mes >= 202101 & foto_mes <= 202103 &
-   #   (clase01 == 1 | azar < 0.10))]
+  dataset_rf[, entrenamiento :=
+    as.integer(foto_mes >= 202101 & foto_mes <= 202103 &
+      (clase01 == 1 | azar < 0.10))]
 
   # imputo los nulos, ya que ranger no acepta nulos
-  # Leo Breiman, �por que le temias a los nulos?
-  #set.seed(semilla, kind = "L'Ecuyer-CMRG")
-  #dataset_rf <- na.roughfix(dataset_rf)
+  # Leo Breiman, ¿por que le temias a los nulos?
+  set.seed(semilla, kind = "L'Ecuyer-CMRG")
+  dataset_rf <- na.roughfix(dataset_rf)
 
-  #campos_buenos <- setdiff(
-   # colnames(dataset_rf),
-    #c("clase_ternaria", "entrenamiento")
- # )
+  campos_buenos <- setdiff(
+    colnames(dataset_rf),
+    c("clase_ternaria", "entrenamiento")
+  )
 
-  # set.seed(semilla, kind = "L'Ecuyer-CMRG")
-  # modelo <- ranger(
-  #   formula = "clase01 ~ .",
-  #   data = dataset_rf[entrenamiento == 1L, campos_buenos, with = FALSE],
-  #   classification = TRUE,
-  #   probability = FALSE,
-  #   num.trees = num.trees,
-  #   max.depth = max.depth,
-  #   min.node.size = min.node.size,
-  #   mtry = mtry,
-  #   seed = semilla,
-#     num.threads = 1
-#   )
-# 
-#   rfhojas <- predict(
-#     object = modelo,
-#     data = dataset_rf[, campos_buenos, with = FALSE],
-#     predict.all = TRUE, # entrega la prediccion de cada arbol
-#     type = "terminalNodes" # entrega el numero de NODO el arbol
-#   )
-# 
-#   for (arbol in 1:num.trees) {
-#     hojas_arbol <- unique(rfhojas$predictions[, arbol])
-# 
-#     for (pos in 1:length(hojas_arbol)) {
-#       # el numero de nodo de la hoja, estan salteados
-#       nodo_id <- hojas_arbol[pos]
-#       dataset[, paste0(
-#         "rf_", sprintf("%03d", arbol),
-#         "_", sprintf("%03d", nodo_id)
-#       ) := 0L]
-# 
-#       dataset[
-#         which(rfhojas$predictions[, arbol] == nodo_id, ),
-#         paste0(
-#           "rf_", sprintf("%03d", arbol),
-#           "_", sprintf("%03d", nodo_id)
-#         ) := 1L
-#       ]
-#     }
-#   }
-# 
-#   rm(dataset_rf)
-#   dataset[, clase01 := NULL]
-# 
-#   gc()
-# }
+  set.seed(semilla, kind = "L'Ecuyer-CMRG")
+  modelo <- ranger(
+    formula = "clase01 ~ .",
+    data = dataset_rf[entrenamiento == 1L, campos_buenos, with = FALSE],
+    classification = TRUE,
+    probability = FALSE,
+    num.trees = num.trees,
+    max.depth = max.depth,
+    min.node.size = min.node.size,
+    mtry = mtry,
+    seed = semilla,
+    num.threads = 1
+  )
+
+  rfhojas <- predict(
+    object = modelo,
+    data = dataset_rf[, campos_buenos, with = FALSE],
+    predict.all = TRUE, # entrega la prediccion de cada arbol
+    type = "terminalNodes" # entrega el numero de NODO el arbol
+  )
+
+  for (arbol in 1:num.trees) {
+    hojas_arbol <- unique(rfhojas$predictions[, arbol])
+
+    for (pos in 1:length(hojas_arbol)) {
+      # el numero de nodo de la hoja, estan salteados
+      nodo_id <- hojas_arbol[pos]
+      dataset[, paste0(
+        "rf_", sprintf("%03d", arbol),
+        "_", sprintf("%03d", nodo_id)
+      ) := 0L]
+
+      dataset[
+        which(rfhojas$predictions[, arbol] == nodo_id, ),
+        paste0(
+          "rf_", sprintf("%03d", arbol),
+          "_", sprintf("%03d", nodo_id)
+        ) := 1L
+      ]
+    }
+  }
+
+  rm(dataset_rf)
+  dataset[, clase01 := NULL]
+
+  gc()
+}
 #------------------------------------------------------------------------------
 VPOS_CORTE <- c()
 
@@ -323,7 +320,7 @@ fganancia_lgbm_meseta <- function(probs, datos) {
   tbl[, gan_acum := cumsum(gan)]
   setorder(tbl, -gan_acum) # voy por la meseta
 
-  gan <- mean(tbl[1:500, gan_acum]) # meseta de tama�o 500
+  gan <- mean(tbl[1:500, gan_acum]) # meseta de tamaño 500
 
   pos_meseta <- tbl[1:500, median(posicion)]
   VPOS_CORTE <<- c(VPOS_CORTE, pos_meseta)
@@ -339,7 +336,7 @@ fganancia_lgbm_meseta <- function(probs, datos) {
 #  de la capa geologica de canaritos
 # se llama varias veces, luego de agregar muchas variables nuevas,
 #  para ir reduciendo la cantidad de variables
-# y as� hacer lugar a nuevas variables importantes
+# y así hacer lugar a nuevas variables importantes
 
 GVEZ <- 1
 
@@ -465,9 +462,9 @@ colnames(dataset)[which(!(sapply(dataset, typeof) %in% c("integer", "double")))]
 
 
 # creo la carpeta donde va el experimento
-dir.create(paste0("./exp_02/", PARAM$experimento, "/"), showWarnings = FALSE)
+dir.create(paste0("./exp_03/", PARAM$experimento, "/"), showWarnings = FALSE)
 # Establezco el Working Directory DEL EXPERIMENTO
-setwd(paste0("./exp_02/", PARAM$experimento, "/"))
+setwd(paste0("./exp_03/", PARAM$experimento, "/"))
 
 GrabarOutput()
 write_yaml(PARAM, file = "parametros.yml") # escribo parametros utilizados
@@ -590,21 +587,21 @@ if (PARAM$Tendencias2$run) {
 
 #------------------------------------------------------------------------------
 # Agrego variables a partir de las hojas de un Random Forest
-# 
-# if (PARAM$RandomForest$run) {
-#   OUTPUT$AgregaVarRandomForest$ncol_antes <- ncol(dataset)
-#   AgregaVarRandomForest(
-#     num.trees = PARAM$RandomForest$num.trees,
-#     max.depth = PARAM$RandomForest$max.depth,
-#     min.node.size = PARAM$RandomForest$min.node.size,
-#     mtry = PARAM$RandomForest$mtry,
-#     semilla = PARAM$RandomForest$semilla
-#   )
-# 
-#   OUTPUT$AgregaVarRandomForest$ncol_despues <- ncol(dataset)
-#   GrabarOutput()
-#   gc()
-# }
+
+if (PARAM$RandomForest$run) {
+  OUTPUT$AgregaVarRandomForest$ncol_antes <- ncol(dataset)
+  AgregaVarRandomForest(
+    num.trees = PARAM$RandomForest$num.trees,
+    max.depth = PARAM$RandomForest$max.depth,
+    min.node.size = PARAM$RandomForest$min.node.size,
+    mtry = PARAM$RandomForest$mtry,
+    semilla = PARAM$RandomForest$semilla
+  )
+
+  OUTPUT$AgregaVarRandomForest$ncol_despues <- ncol(dataset)
+  GrabarOutput()
+  gc()
+}
 
 
 #--------------------------------------------------------------------------
