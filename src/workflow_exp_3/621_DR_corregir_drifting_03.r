@@ -258,7 +258,7 @@ setwd(PARAM$home)
 
 # cargo el dataset donde voy a entrenar
 # esta en la carpeta del exp_input y siempre se llama  dataset.csv.gz
-dataset_input <- paste0("./exp_02/", PARAM$exp_input, "/dataset.csv.gz")
+dataset_input <- paste0("./exp_03/", PARAM$exp_input, "/dataset.csv.gz")
 dataset <- fread(dataset_input)
 
 # creo la carpeta donde va el experimento
