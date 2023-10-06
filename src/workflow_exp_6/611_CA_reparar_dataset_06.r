@@ -224,7 +224,7 @@ dataset[, tmobile_app := NULL]
 # creo la carpeta donde va el experimento
 dir.create(paste0("./exp_06/", PARAM$experimento, "/"), showWarnings = FALSE)
 # Establezco el Working Directory DEL EXPERIMENTO
-setwd(paste0("./exp_06 PARAM$experimento, "/"))
+setwd(paste0("./exp_06/", PARAM$experimento, "/"))
 
 GrabarOutput()
 write_yaml(PARAM, file = "parametros.yml") # escribo parametros utilizados
