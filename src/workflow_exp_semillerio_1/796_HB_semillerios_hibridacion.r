@@ -61,12 +61,12 @@ verificacion_rapida  <- function( home_dir, exp_input )
 
   # Segunda comprobacion rapida, veo que existan los experimentos
   i  <- 1L
-  while( dir.exists(file.path(home_dir, "exp", exp_input[i] )) )  i  <- i + 1L
+  while( dir.exists(file.path(home_dir, "exp_sem_01", exp_input[i] )) )  i  <- i + 1L
   if( i <= length( exp_input ) )   stop( "Fatal Error. No existe el experimento ", exp_input[i], "\n" )
 
   # Tercera comprobacion rapida, veo que existan archivos csv para todos los experimentos
   i  <- 1L
-  while( length( list.files( file.path(home_dir, "exp", exp_input[i] ),
+  while( length( list.files( file.path(home_dir, "exp_sem_01", exp_input[i] ),
                              pattern= "^pred_*" ) ) > 0L  )    { i  <- i + 1L }
 
   if( i <= length( exp_input ) )   stop( "Fatal Error. En la carpeta ", exp_input[i], " No existe archivo pred \n" )
@@ -190,8 +190,8 @@ OUTPUT$time$start  <- format(Sys.time(), "%Y%m%d %H%M%S")
 verificacion_rapida( PARAM$home, PARAM$exp_input )
 
 #creo la carpeta donde va el experimento
-dir.create( paste0( PARAM$home, "exp/", PARAM$experimento, "/"), showWarnings= FALSE )
-setwd(paste0( PARAM$home, "exp/", PARAM$experimento, "/"))   #Establezco el Working Directory DEL EXPERIMENTO
+dir.create( paste0( PARAM$home, "exp_sem_01/", PARAM$experimento, "/"), showWarnings= FALSE )
+setwd(paste0( PARAM$home, "exp_sem_01/", PARAM$experimento, "/"))   #Establezco el Working Directory DEL EXPERIMENTO
 
 GrabarOutput()
 write_yaml( PARAM, file= "parametros.yml" )   #escribo parametros utilizados
@@ -205,7 +205,7 @@ primera_vez  <- TRUE
 for( exp_input  in  PARAM$exp_input )
 {
   cat( "\nExperimento : ", exp_input, "  " )
-  predicciones  <- list.files( file.path( PARAM$home, "exp", exp_input),
+  predicciones  <- list.files( file.path( PARAM$home, "exp_sem_01", exp_input),
                                pattern= "^pred_*",
                                full.names= TRUE )
 
